@@ -2,7 +2,7 @@
 
 ![Ralph](ralph.webp)
 
-Ralph is an autonomous AI agent loop that runs [Amp](https://ampcode.com) repeatedly until all PRD items are complete. Each iteration is a fresh Amp instance with clean context. Memory persists via git history, `progress.txt`, and `prd.json`.
+Ralph is an autonomous AI agent loop that runs [Amp](https://ampcode.com) or [OpenCode](https://opencode.ai) repeatedly until all PRD items are complete. Each iteration is a fresh agent instance with clean context. Memory persists via git history, `progress.txt`, and `prd.json`.
 
 Based on [Geoffrey Huntley's Ralph pattern](https://ghuntley.com/ralph/).
 
@@ -10,7 +10,7 @@ Based on [Geoffrey Huntley's Ralph pattern](https://ghuntley.com/ralph/).
 
 ## Prerequisites
 
-- [Amp CLI](https://ampcode.com) installed and authenticated
+- [Amp CLI](https://ampcode.com) or [OpenCode CLI](https://opencode.ai) installed and authenticated
 - `jq` installed (`brew install jq` on macOS)
 - A git repository for your project
 
@@ -37,6 +37,13 @@ cp -r skills/prd ~/.config/amp/skills/
 cp -r skills/ralph ~/.config/amp/skills/
 ```
 
+Copy the skills to your OpenCode config for use across all projects:
+
+```bash
+cp -r skills/prd ~/.config/opencode/skills/
+cp -r skills/ralph ~/.config/opencode/skills/
+```
+
 ### Configure Amp auto-handoff (recommended)
 
 Add to `~/.config/amp/settings.json`:
@@ -48,6 +55,15 @@ Add to `~/.config/amp/settings.json`:
 ```
 
 This enables automatic handoff when context fills up, allowing Ralph to handle large stories that exceed a single context window.
+
+### Configure OpenCode CLI usage
+
+Ralph defaults to `amp` if installed, otherwise it uses `opencode`. You can override the CLI and arguments:
+
+```bash
+export RALPH_CLI=opencode
+export RALPH_CLI_ARGS="--dangerously-allow-all"
+```
 
 ## Workflow
 
@@ -93,8 +109,8 @@ Ralph will:
 
 | File | Purpose |
 |------|---------|
-| `ralph.sh` | The bash loop that spawns fresh Amp instances |
-| `prompt.md` | Instructions given to each Amp instance |
+| `ralph.sh` | The bash loop that spawns fresh agent instances |
+| `prompt.md` | Instructions given to each agent instance |
 | `prd.json` | User stories with `passes` status (the task list) |
 | `prd.json.example` | Example PRD format for reference |
 | `progress.txt` | Append-only learnings for future iterations |
@@ -120,7 +136,7 @@ npm run dev
 
 ### Each Iteration = Fresh Context
 
-Each iteration spawns a **new Amp instance** with clean context. The only memory between iterations is:
+Each iteration spawns a **new agent instance** with clean context. The only memory between iterations is:
 - Git history (commits from previous iterations)
 - `progress.txt` (learnings and context)
 - `prd.json` (which stories are done)
