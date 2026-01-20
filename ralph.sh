@@ -53,14 +53,34 @@ fi
 
 echo "Starting Ralph - Max iterations: $MAX_ITERATIONS"
 
+RALPH_CLI="${RALPH_CLI:-}"
+RALPH_CLI_ARGS="${RALPH_CLI_ARGS:-}"
+
+if [ -z "$RALPH_CLI" ]; then
+  if command -v amp >/dev/null 2>&1; then
+    RALPH_CLI="amp"
+  elif command -v opencode >/dev/null 2>&1; then
+    RALPH_CLI="opencode"
+  else
+    echo "Error: No supported CLI found. Install amp or opencode, or set RALPH_CLI." >&2
+    exit 1
+  fi
+fi
+
+if [ -z "$RALPH_CLI_ARGS" ]; then
+  RALPH_CLI_ARGS="--dangerously-allow-all"
+fi
+
+echo "Using CLI: $RALPH_CLI $RALPH_CLI_ARGS"
+
 for i in $(seq 1 $MAX_ITERATIONS); do
   echo ""
   echo "═══════════════════════════════════════════════════════"
   echo "  Ralph Iteration $i of $MAX_ITERATIONS"
   echo "═══════════════════════════════════════════════════════"
   
-  # Run amp with the ralph prompt
-  OUTPUT=$(cat "$SCRIPT_DIR/prompt.md" | amp --dangerously-allow-all 2>&1 | tee /dev/stderr) || true
+  # Run the configured CLI with the ralph prompt
+  OUTPUT=$(cat "$SCRIPT_DIR/prompt.md" | "$RALPH_CLI" $RALPH_CLI_ARGS 2>&1 | tee /dev/stderr) || true
   
   # Check for completion signal
   if echo "$OUTPUT" | grep -q "<promise>COMPLETE</promise>"; then
